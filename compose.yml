@@ -63,6 +63,8 @@ services:
       traefik.enable: true
       # middleware redirect
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
+      traefik.http.middlewares.traefik-auth.basicauth.users: ${TRAEFIK_AUTH}
+
       # redirection HTTP to HTTPS
       traefik.http.routers.http_catchall.entrypoints: http
       traefik.http.routers.http_catchall.rule: hostregexp(`{host:.+}`)
@@ -74,6 +76,7 @@ services:
       traefik.http.routers.traefik.service: api@internal
       traefik.http.routers.traefik.tls: true
       traefik.http.routers.traefik.tls.certresolver: cloudflare
+      traefik.http.routers.traefik.middlewares: traefik-auth
 
 networks:
   proxy:
