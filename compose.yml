@@ -34,7 +34,7 @@ services:
       - ${ADGUARD_PORT}:3000
     networks:
       proxy:
-        ipv4_address: ${ADGUARD_CONTAINER_IP]
+        ipv4_address: ${ADGUARD_CONTAINER_IP}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -58,7 +58,7 @@ services:
       - ./traefik/logs:/var/log/traefik
     networks:
       proxy:
-        ipv4_address: ${TRAEFIK_CONTAINER_IP]
+        ipv4_address: ${TRAEFIK_CONTAINER_IP}
     labels:
       traefik.enable: true
       # middleware redirect
