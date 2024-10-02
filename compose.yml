@@ -1,0 +1,83 @@
+---
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE #optional
+    env_file:
+      - wg.env
+    volumes:
+      - ./wireguard/config:/config
+      - /lib/modules:/lib/modules #optional
+    ports:
+      - ${WG_PORT}:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      proxy:
+        ipv4_address: ${WG_CONTAINER_IP}
+
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome
+    restart: unless-stopped
+    hostname: adguard
+    volumes:
+      - "./adguard/work:/opt/adguardhome/work"
+      - "./adguard/conf:/opt/adguardhome/conf"
+    ports:
+      - ${ADGUARD_PORT}:3000
+    networks:
+      proxy:
+        ipv4_address: ${ADGUARD_CONTAINER_IP]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+      - 443:443
+    env_file:
+      - traefik.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+      - ./traefik/config.yml:/config.yml:ro
+      - ./traefik/logs:/var/log/traefik
+    networks:
+      proxy:
+        ipv4_address: ${TRAEFIK_CONTAINER_IP]
+    labels:
+      traefik.enable: true
+      # middleware redirect
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
+      # redirection HTTP to HTTPS
+      traefik.http.routers.http_catchall.entrypoints: http
+      traefik.http.routers.http_catchall.rule: hostregexp(`{host:.+}`)
+      traefik.http.routers.http_catchall.middlewares: redirect-to-https
+
+      # dashboard
+      traefik.http.routers.traefik.rule: Host(`${DASHBOARD_HOST}`)
+      traefik.http.routers.traefik.entrypoints: https
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.tls: true
+      traefik.http.routers.traefik.tls.certresolver: cloudflare
+
+networks:
+  proxy:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
