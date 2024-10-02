@@ -80,6 +80,22 @@ services:
       traefik.http.routers.traefik.tls.certresolver: cloudflare
       traefik.http.routers.traefik.middlewares: traefik-auth
 
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    env_file:
+      - crowdsec.env
+    volumes:
+      - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
+      - ./crowdsec/db:/var/lib/crowdsec/data/
+      - ./crowdsec/config:/etc/crowdsec/
+      - ./traefik/logs:/var/log/traefik/:ro
+    networks:
+      - proxy
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
 networks:
   proxy:
     ipam:
