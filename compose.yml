@@ -91,7 +91,8 @@ services:
       - ./crowdsec/config:/etc/crowdsec/
       - ./traefik/logs:/var/log/traefik/:ro
     networks:
-      - proxy
+      proxy:
+        ipv4_address: ${CROWDSEC_CONTAINER_IP}
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
