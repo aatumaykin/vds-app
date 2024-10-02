@@ -7,7 +7,7 @@ services:
       - NET_ADMIN
       - SYS_MODULE #optional
     env_file:
-      - wg.env
+      - .env
     volumes:
       - ./wireguard/config:/config
       - /lib/modules:/lib/modules #optional
@@ -30,8 +30,6 @@ services:
     volumes:
       - "./adguard/work:/opt/adguardhome/work"
       - "./adguard/conf:/opt/adguardhome/conf"
-    ports:
-      - ${ADGUARD_PORT}:3000
     networks:
       proxy:
         ipv4_address: ${ADGUARD_CONTAINER_IP}
@@ -50,7 +48,7 @@ services:
       - 80:80
       - 443:443
     env_file:
-      - traefik.env
+      - .env
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -84,7 +82,7 @@ services:
     image: crowdsecurity/crowdsec:latest
     container_name: crowdsec
     env_file:
-      - crowdsec.env
+      - .env
     volumes:
       - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
       - ./crowdsec/db:/var/lib/crowdsec/data/
