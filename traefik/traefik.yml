@@ -22,7 +22,8 @@ providers:
     exposedByDefault: false
 
   file:
-    filename: /config.yml
+    directory: /config
+    watch: true
 
 certificatesResolvers:
   cloudflare:

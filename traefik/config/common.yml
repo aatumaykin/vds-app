@@ -1,11 +1,4 @@
 http:
-  #region routers
-  routers:
-
-  #region services
-
-  services:
-
   middlewares:
     https-redirect:
       redirectScheme:
