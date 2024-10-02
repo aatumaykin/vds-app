@@ -9,5 +9,6 @@ crowdsec/db/
 
 wireguard/config/
 
+traefik/acme.json
 traefik/config/
 traefik/logs/
