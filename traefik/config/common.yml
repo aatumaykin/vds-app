@@ -8,7 +8,7 @@ http:
     crowdsec:
       plugin:
         crowdsec-bouncer-traefik-plugin:
-          enabled: false
+          enabled: true
           logLevel: INFO
           updateIntervalSeconds: 15
           updateMaxFailure: 0
