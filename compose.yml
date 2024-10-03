@@ -5,12 +5,18 @@ services:
     container_name: wireguard
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE #optional
+      - SYS_MODULE
     env_file:
       - .env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+      - PERSISTENTKEEPALIVE_PEERS=15
+      - LOG_CONFS=true
     volumes:
       - ./wireguard/config:/config
-      - /lib/modules:/lib/modules #optional
+      - /lib/modules:/lib/modules
     ports:
       - ${WIREGUARD_PORT:-51820}:51820/udp
     sysctls:
@@ -69,7 +75,6 @@ services:
       traefik.enable: true
       # middleware redirect
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
-      traefik.http.middlewares.traefik-auth.basicauth.users: ${TRAEFIK_AUTH}
 
       # redirection HTTP to HTTPS
       traefik.http.routers.http_catchall.entrypoints: http
@@ -86,6 +91,10 @@ services:
     container_name: crowdsec
     env_file:
       - .env
+    environment:
+      GID: 1000
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"
+      TZ: Europe/Moscow
     volumes:
       - ./crowdsec/db:/var/lib/crowdsec/data/
       - ./crowdsec/config:/etc/crowdsec/
