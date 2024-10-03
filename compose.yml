@@ -96,13 +96,11 @@ services:
       - crowdsec
     labels:
       traefik.enable: true
-      # middleware redirect
-      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
 
       # redirection HTTP to HTTPS
       traefik.http.routers.http_catchall.entrypoints: http
       traefik.http.routers.http_catchall.rule: hostregexp(`{host:.+}`)
-      traefik.http.routers.http_catchall.middlewares: redirect-to-https
+      traefik.http.routers.http_catchall.middlewares: https-redirect@file
 
       # dashboard
       traefik.http.routers.traefik.rule: PathPrefix(`/api`) || PathPrefix(`/dashboard`)
