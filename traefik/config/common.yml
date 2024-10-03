@@ -24,8 +24,10 @@ http:
           crowdsecLapiScheme: http
           forwardedHeadersTrustedIPs:
             - 172.18.0.0/24 # Reverse Proxy IP address
+            - {{ env "NETWORK_SUBNET" }}
           clientTrustedIPs:
             - 192.168.0.0/16
+            - {{ env "INTERNAL_SUBNET" }}/24
 
     default-headers:
       headers:
