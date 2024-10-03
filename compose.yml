@@ -12,15 +12,17 @@ services:
       - ./wireguard/config:/config
       - /lib/modules:/lib/modules #optional
     ports:
-      - ${WG_PORT}:51820/udp
+      - ${WIREGUARD_PORT:-51820}:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE && /init"]
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       proxy:
-        ipv4_address: ${WG_CONTAINER_IP}
+        ipv4_address: ${WIREGUARD_CONTAINER_IP:-10.0.0.2}
 
   adguard:
     container_name: adguard
@@ -32,7 +34,7 @@ services:
       - "./adguard/conf:/opt/adguardhome/conf"
     networks:
       proxy:
-        ipv4_address: ${ADGUARD_CONTAINER_IP}
+        ipv4_address: ${ADGUARD_CONTAINER_IP:-10.0.0.100}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -51,6 +53,8 @@ services:
       - 8080
     env_file:
       - .env
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ip route add 192.168.0.0/16 via ${WIREGUARD_CONTAINER_IP} && traefik"]
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -60,7 +64,7 @@ services:
       - ./traefik/logs:/var/log/traefik
     networks:
       proxy:
-        ipv4_address: ${TRAEFIK_CONTAINER_IP}
+        ipv4_address: ${TRAEFIK_CONTAINER_IP:-10.0.0.3}
     labels:
       traefik.enable: true
       # middleware redirect
@@ -83,13 +87,13 @@ services:
     env_file:
       - .env
     volumes:
-      - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
       - ./crowdsec/db:/var/lib/crowdsec/data/
       - ./crowdsec/config:/etc/crowdsec/
+      - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
       - ./traefik/logs:/var/log/traefik/:ro
     networks:
       proxy:
-        ipv4_address: ${CROWDSEC_CONTAINER_IP}
+        ipv4_address: ${CROWDSEC_CONTAINER_IP:-10.0.0.4}
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -99,4 +103,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: ${NETWORK_SUBNET}
+        - subnet: ${NETWORK_SUBNET:-10.0.0.0/24}
