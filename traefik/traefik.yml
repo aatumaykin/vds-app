@@ -18,6 +18,9 @@ entryPoints:
 #      middlewares:
 #        - "crowdsec@file"
 
+  internal:
+    address: ":8080"
+
 serversTransport:
   insecureSkipVerify: true
 
