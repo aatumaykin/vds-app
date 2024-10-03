@@ -5,27 +5,27 @@ http:
         scheme: https
         permanent: true
 
-#    crowdsec:
-#      plugin:
-#        crowdsec-bouncer-traefik-plugin:
-#          enabled: true
-#          logLevel: INFO
-#          updateIntervalSeconds: 15
-#          updateMaxFailure: 0
-#          defaultDecisionSeconds: 15
-#          httpTimeoutSeconds: 10
-#          crowdsecMode: stream
-#          crowdsecAppsecEnabled: true
-#          crowdsecAppsecHost: crowdsec:7422
-#          crowdsecAppsecFailureBlock: true
-#          crowdsecAppsecUnreachableBlock: true
-#          crowdsecLapiKey: enkkmdwtLllLr24Du3p9vFA78B6li66pXTBWZRo1rm0      # Replace CrowdSec API key (docker exec crowdsec cscli bouncers add crowdsecBouncer)
-#          crowdsecLapiHost: crowdsec:8080
-#          crowdsecLapiScheme: http
-#          forwardedHeadersTrustedIPs:
-#            - 172.18.0.0/24 # Reverse Proxy IP address
-#          clientTrustedIPs:
-#            - 192.168.0.0/24
+    crowdsec:
+      plugin:
+        crowdsec-bouncer-traefik-plugin:
+          enabled: false
+          logLevel: INFO
+          updateIntervalSeconds: 15
+          updateMaxFailure: 0
+          defaultDecisionSeconds: 15
+          httpTimeoutSeconds: 10
+          crowdsecMode: stream
+          crowdsecAppsecEnabled: true
+          crowdsecAppsecHost: crowdsec:7422
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecUnreachableBlock: true
+          crowdsecLapiKey: {{ env "BOUNCER_KEY_TRAEFIK" }}      # Replace CrowdSec API key (docker exec crowdsec cscli bouncers add crowdsecBouncer)
+          crowdsecLapiHost: crowdsec:8080
+          crowdsecLapiScheme: http
+          forwardedHeadersTrustedIPs:
+            - 172.18.0.0/24 # Reverse Proxy IP address
+          clientTrustedIPs:
+            - 192.168.0.0/16
 
     default-headers:
       headers:
